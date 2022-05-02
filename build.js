@@ -28,6 +28,11 @@ let allowCompile = true;
 // Find arduino port
 console.log('⏳ Looking for arduino board...');
 exec('arduino-cli board list', (error, stdout, stderr) => {
+    if (error) {
+        console.error('❌ Something went wrong while getting board list');
+        return;
+    }
+
     const arduinoPort = getArduinoPort(stdout);
 
     if (!arduinoPort) {
