@@ -14,18 +14,36 @@ const options = yargs
     .option('w', { alias: 'watch', describe: 'Watch file changes', type: 'bool', demandOption: false })
     .argv;
 
-const port = process.env.PORT;
+// Setup
 const fqbn = process.env.FQBN;
 const name = options.name;
 const path = `./scripts/${name}/${name}.ino`;
 
-const commandCompile = `arduino-cli compile --fqbn ${fqbn} scripts/${name}`;
-const commandUpload = `arduino-cli upload -p ${port} --fqbn ${fqbn} scripts/${name}`;
+const commands = {};
+commands.compile = `arduino-cli compile --fqbn ${fqbn} scripts/${name}`;
 
 let scriptContent = md5(fs.readFileSync(path));
 let allowCompile = true;
 
-function setup() {
+// Find arduino port
+console.log('⏳ Looking for arduino board...');
+exec('arduino-cli board list', (error, stdout, stderr) => {
+    const arduinoPort = getArduinoPort(stdout);
+
+    if (!arduinoPort) {
+        console.error('❌ Couldnt find any arduino board connected through USB');
+        return;
+    }
+
+    console.log(`✅ Board founded on port ${arduinoPort}!\n`);
+
+    // Setup upload command
+    commands.upload = `arduino-cli upload -p ${arduinoPort} --fqbn ${fqbn} scripts/${name}`;
+
+    start();
+});
+
+function start() {
     compileAndUpload();
 
     if (options.watch) watch();
@@ -55,7 +73,7 @@ function compileAndUpload() {
 
     console.log('⏳ Compiling...');
 
-    exec(commandCompile, (compileError, compileResponse) => {
+    exec(commands.compile, (compileError, compileResponse) => {
         if (compileError) {
             console.error('❌ Compiling Failed');
             console.error(compileError);
@@ -67,7 +85,7 @@ function compileAndUpload() {
 
         console.log('⏳ Uploading...');
 
-        exec(commandUpload, (uploadError, uploadResponse) => {
+        exec(commands.upload, (uploadError, uploadResponse) => {
             if (uploadError) {
                 console.error('❌ Uploading Failed');
                 console.error(uploadError);
@@ -82,4 +100,19 @@ function compileAndUpload() {
     });
 }
 
-setup();
+function getArduinoPort(boardList) {
+    const lines = boardList.split('\n');
+
+    const ports = lines.filter((item) => {
+        return item.includes('Serial Port');
+    });
+    const usbPorts = ports.filter((item) => {
+        return item.includes('Serial Port (USB)');
+    });
+
+    if (usbPorts.length === 0) return;
+
+    const port = usbPorts[0].split(' ')[0];
+
+    return port;
+}
