@@ -3,6 +3,7 @@ const fs = require('fs');
 const yargs = require('yargs');
 const md5 = require('md5');
 const { exec } = require('child_process');
+const { getArduinoBoardPort } = require('utils');
 
 // Config
 require('dotenv').config();
@@ -26,27 +27,15 @@ let scriptContent = md5(fs.readFileSync(path));
 let allowCompile = true;
 
 // Find arduino port
-console.log('⏳ Looking for arduino board...');
-exec('arduino-cli board list', (error, stdout, stderr) => {
-    if (error) {
-        console.error('❌ Something went wrong while getting board list');
-        return;
-    }
-
-    const arduinoPort = getArduinoPort(stdout);
-
-    if (!arduinoPort) {
-        console.error('❌ Couldnt find any arduino board connected through USB');
-        return;
-    }
-
-    console.log(`✅ Board founded on port ${arduinoPort}!\n`);
-
+getArduinoBoardPort().then(
+    (arduinoPort) => {
     // Setup upload command
-    commands.upload = `arduino-cli upload -p ${arduinoPort} --fqbn ${fqbn} scripts/${name}`;
-
-    start();
-});
+        commands.upload = `arduino-cli upload -p ${arduinoPort} --fqbn ${fqbn} scripts/${name}`;
+        start();
+    },
+    (error) => {
+        console.log(error);
+    });
 
 function start() {
     compileAndUpload();
@@ -103,21 +92,4 @@ function compileAndUpload() {
             console.log(uploadResponse);
         });
     });
-}
-
-function getArduinoPort(boardList) {
-    const lines = boardList.split('\n');
-
-    const ports = lines.filter((item) => {
-        return item.includes('Serial Port');
-    });
-    const usbPorts = ports.filter((item) => {
-        return item.includes('Serial Port (USB)');
-    });
-
-    if (usbPorts.length === 0) return;
-
-    const port = usbPorts[0].split(' ')[0];
-
-    return port;
 }
