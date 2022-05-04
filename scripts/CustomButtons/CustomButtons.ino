@@ -1,12 +1,12 @@
 
-#include <Adafruit_NeoPixel.h>
+// #include <Adafruit_NeoPixel.h>
 
 const int baudRate = 9600;
 // Neo Pixel
-const int PIN = 12;
-const int NUMPIXELS = 2;
+// const int PIN = 12;
+// const int NUMPIXELS = 2;
 
-Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+// Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 const int firstButtonPin = 4;  
 const int secondButtonPin = 5; 
@@ -22,7 +22,7 @@ bool isButtonUp = false;
 void setup()
 {
     setupSerial();
-    setupNeoPixel();
+    // setupNeoPixel();
     setupButtons();
 }
 
@@ -33,7 +33,7 @@ void setupSerial()
 
 void setupNeoPixel()
 {
-    pixels.begin();
+    // pixels.begin();
 }
 
 void setupButtons()
@@ -45,7 +45,7 @@ void setupButtons()
 
 void loop()
 {
-    pixels.setBrightness(10);
+    // pixels.setBrightness(10);
 
     if(digitalRead(firstButtonPin) == HIGH) {
         readingButton("first", 0, 255, 0, 0);
@@ -64,15 +64,15 @@ void loop()
 
     if(isFirstButtonPressed && digitalRead(firstButtonPin) == LOW) {
         isFirstButtonPressed = false;
-        hideLed();
+        // hideLed();
     }
     if(isSecondButtonPressed && digitalRead(secondButtonPin) == LOW) {
         isSecondButtonPressed = false;
-        hideLed();
+        // hideLed();
     }
     if(isThirdButtonPressed && digitalRead(thirdButtonPin) == LOW) {
         isThirdButtonPressed = false;
-        hideLed();
+        // hideLed();
     }
 }
 
@@ -81,14 +81,14 @@ void checkPush(int pinNumber)
   int pushed = digitalRead(pinNumber);
   if (pushed == HIGH) {
 
-    pixels.clear();
-    pixels.setPixelColor(0, 0, 255, 0);
-    pixels.show();
+    // pixels.clear();
+    // pixels.setPixelColor(0, 0, 255, 0);
+    // pixels.show();
   }
   else {
-    pixels.clear();
-    pixels.setPixelColor(0, 255, 255, 255);
-    pixels.show();
+    // pixels.clear();
+    // pixels.setPixelColor(0, 255, 255, 255);
+    // pixels.show();
   }
 
 }
@@ -96,22 +96,22 @@ void checkPush(int pinNumber)
 void readingButton(String buttonType, int ledNumber, int redColor, int blueColor, int greenColor) 
 {
     Serial.println(buttonType);
-    showLed(ledNumber, redColor, blueColor, greenColor);
+    // showLed(ledNumber, redColor, blueColor, greenColor);
 }
 
 void showLed(int ledNumber, int redColor, int blueColor, int greenColor)
 {
-    pixels.clear();
-    pixels.setPixelColor(ledNumber, redColor, blueColor, greenColor);
-    pixels.show();
+    // pixels.clear();
+    // pixels.setPixelColor(ledNumber, redColor, blueColor, greenColor);
+    // pixels.show();
     delay(10);
 }
 
 void hideLed()
 {
-    pixels.clear();
-    pixels.setPixelColor(0, 255, 255, 255);
-    pixels.setPixelColor(1, 255, 255, 255);
-    pixels.show();
+    // pixels.clear();
+    // pixels.setPixelColor(0, 255, 255, 255);
+    // pixels.setPixelColor(1, 255, 255, 255);
+    // pixels.show();
     delay(10);
 }

@@ -9,10 +9,10 @@ BasicButton firstButton = BasicButton(4);
 BasicButton secondButton = BasicButton(5);
 BasicButton thirdButton = BasicButton(6);
 
-const int PIN = 12;
-const int NUMPIXELS = 2;
+// const int PIN = 12;
+// const int NUMPIXELS = 2;
 
-Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+// Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
 void setup()
 {
@@ -36,7 +36,7 @@ void setupSerial()
 
 void setupNeoPixel()
 {
-    pixels.begin();
+    // pixels.begin();
 }
 
 void loop(){
@@ -67,17 +67,17 @@ void readingButton(String buttonType, int ledNumber, int redColor, int blueColor
 
 void showLed(int ledNumber, int redColor, int blueColor, int greenColor)
 {
-    pixels.clear();
-    pixels.setPixelColor(ledNumber, redColor, blueColor, greenColor);
-    pixels.show();
+    // pixels.clear();
+    // pixels.setPixelColor(ledNumber, redColor, blueColor, greenColor);
+    // pixels.show();
     delay(10);
 }
 
 void hideLed()
 {
-    pixels.clear();
-    pixels.setPixelColor(0, 255, 255, 255);
-    pixels.setPixelColor(1, 255, 255, 255);
-    pixels.show();
+    // pixels.clear();
+    // pixels.setPixelColor(0, 255, 255, 255);
+    // pixels.setPixelColor(1, 255, 255, 255);
+    // pixels.show();
     delay(10);
 }
