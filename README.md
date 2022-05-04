@@ -89,6 +89,15 @@ Compile and upload to your board on file changes
 node build.js --name MySketch --watch
 ```
 
+### ButtonsJoysticks
+
+If you use this script you have to include a library for buttons
+
+Download the Buttons.zip in /libraries.
+In your computer go to your_user_name/Documents/Arduino/Library and include the Buttons.zip
+
+
+
 ## Authors
 
 [@LPGeneret](https://twitter.com/LPGeneret)
