@@ -3,6 +3,7 @@ const fs = require('fs');
 const yargs = require('yargs');
 const md5 = require('md5');
 const { exec } = require('child_process');
+const { getArduinoBoardPort } = require('utils');
 
 // Config
 require('dotenv').config();
@@ -14,18 +15,29 @@ const options = yargs
     .option('w', { alias: 'watch', describe: 'Watch file changes', type: 'bool', demandOption: false })
     .argv;
 
-const port = process.env.PORT;
+// Setup
 const fqbn = process.env.FQBN;
 const name = options.name;
 const path = `./scripts/${name}/${name}.ino`;
 
-const commandCompile = `arduino-cli compile --fqbn ${fqbn} scripts/${name}`;
-const commandUpload = `arduino-cli upload -p ${port} --fqbn ${fqbn} scripts/${name}`;
+const commands = {};
+commands.compile = `arduino-cli compile --fqbn ${fqbn} scripts/${name}`;
 
 let scriptContent = md5(fs.readFileSync(path));
 let allowCompile = true;
 
-function setup() {
+// Find arduino port
+getArduinoBoardPort().then(
+    (arduinoPort) => {
+    // Setup upload command
+        commands.upload = `arduino-cli upload -p ${arduinoPort} --fqbn ${fqbn} scripts/${name}`;
+        start();
+    },
+    (error) => {
+        console.log(error);
+    });
+
+function start() {
     compileAndUpload();
 
     if (options.watch) watch();
@@ -55,7 +67,7 @@ function compileAndUpload() {
 
     console.log('⏳ Compiling...');
 
-    exec(commandCompile, (compileError, compileResponse) => {
+    exec(commands.compile, (compileError, compileResponse) => {
         if (compileError) {
             console.error('❌ Compiling Failed');
             console.error(compileError);
@@ -67,7 +79,7 @@ function compileAndUpload() {
 
         console.log('⏳ Uploading...');
 
-        exec(commandUpload, (uploadError, uploadResponse) => {
+        exec(commands.upload, (uploadError, uploadResponse) => {
             if (uploadError) {
                 console.error('❌ Uploading Failed');
                 console.error(uploadError);
@@ -81,5 +93,3 @@ function compileAndUpload() {
         });
     });
 }
-
-setup();

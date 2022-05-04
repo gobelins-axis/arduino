@@ -24,15 +24,17 @@
     "body-parser": "^1.19.1",
     "cors": "^2.8.5",
     "dotenv": "^16.0.0",
-    "express": "^4.17.2",
-    "md5": "^2.3.0",
-    "serialport": "^9.2.8",
-    "yargs": "^17.3.1",
     "eslint": "^8.12.0",
-    "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-n": "^15.1.0",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.0.0"
+    "eslint-plugin-promise": "^6.0.0",
+    "express": "^4.17.2",
+    "md5": "^2.3.0",
+    "serialport": "^9.2.8",
+    "yargs": "^17.3.1"
+  },
+  "dependencies": {
+    "utils": "github:arcade-feu/utils"
   }
 }

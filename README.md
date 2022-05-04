@@ -10,8 +10,8 @@ More information on the [Arduino CLI documentation](https://arduino.github.io/ar
 
 ### Dependencies
 
-- Node.js - [Install](https://nodejs.org/en/download/)
-- Arduino CLI - [Install](https://arduino.github.io/arduino-cli/0.20/installation/)
+-   Node.js - [Install](https://nodejs.org/en/download/)
+-   Arduino CLI - [Install](https://arduino.github.io/arduino-cli/0.20/installation/)
 
 ### Installing
 
@@ -42,9 +42,12 @@ Connect the Arduino board via USB
 arduino-cli board list
 ```
 
-Spot your arduino board and store the port and FQBN (if detected) somewhere, you'll need it soon.
+Spot your arduino board and store the FQBN (if detected) somewhere, you'll need it soon.
+If it's marked as Unknown, try to find it online by Arduino model / version or use this command :
 
-If you cant find the FQBN, try to find it online by Arduino model / version...
+```bash
+arduino-cli board listall mkr
+```
 
 ### Install the core for your board
 
@@ -58,10 +61,9 @@ arduino-cli core install arduino:avr
 ### Configure build script
 
 We created a node script to make it easier to compile and upload your code to Arduino.
-Create a .env file at the root of the project and add your port, FBQN strings. example:
+Create a .env file at the root of the project and the FBQN string. example:
 
 ```env
-PORT=/dev/cu.usbserial-14310
 FQBN=arduino:avr:nano:cpu=atmega328old
 ```
 
