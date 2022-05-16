@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/arcade-feu/arduino.git"
+    "url": "git+https://github.com/gobelins-axis/arduino.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/arcade-feu/arduino/issues"
+    "url": "https://github.com/gobelins-axis/arduino/issues"
   },
-  "homepage": "https://github.com/arcade-feu/arduino#readme",
+  "homepage": "https://github.com/gobelins-axis/arduino#readme",
   "devDependencies": {
     "@babel/core": "^7.17.8",
     "@babel/eslint-parser": "^7.17.0",
@@ -35,6 +35,6 @@
     "yargs": "^17.3.1"
   },
   "dependencies": {
-    "utils": "github:arcade-feu/utils"
+    "utils": "github:gobelins-axis/utils"
   }
 }
