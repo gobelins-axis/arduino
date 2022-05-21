@@ -49,7 +49,8 @@ void setupSerial()
 
 void setupLeds()
 {
-    pixels.begin();
+    strip1.begin();
+    strip2.begin();
 }
 
 void setupButtons()
@@ -112,7 +113,8 @@ void loop()
 
     // Leds
     // pixels.setPixelColor(0, 0, 255, 0);
-    pixels.show();
+    strip1.show();
+    strip2.show();
 }
 
 void listenSerial()
