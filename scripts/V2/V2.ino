@@ -4,13 +4,14 @@
 #include <Adafruit_NeoPixel.h>
 
 // Serial
+// const int BAUD_RATE = 115200;
 const int BAUD_RATE = 9600;
 
 // Controller set 1
-// BasicButton buttonA1 = BasicButton(2);
-// BasicButton buttonB1 = BasicButton(3);
-// BasicButton buttonC1 = BasicButton(4);
-// BasicButton buttonD1 = BasicButton(5);
+BasicButton buttonA1 = BasicButton(2);
+BasicButton buttonB1 = BasicButton(3);
+BasicButton buttonC1 = BasicButton(4);
+BasicButton buttonD1 = BasicButton(5);
 // BasicButton buttonE1 = BasicButton(6);
 
 const int Joystick1X = 4;
@@ -31,9 +32,9 @@ const int PIN_STRIP_1 = 12;
 const int LED_COUNT_STRIP_1 = 4;
 Adafruit_NeoPixel strip1(LED_COUNT_STRIP_1, PIN_STRIP_1, NEO_GRB + NEO_KHZ800);
 
-const int PIN_STRIP_2 = 11;
-const int LED_COUNT_STRIP_2 = 4;
-Adafruit_NeoPixel strip2(LED_COUNT_STRIP_2, PIN_STRIP_2, NEO_GRB + NEO_KHZ800);
+// const int PIN_STRIP_2 = 11;
+// const int LED_COUNT_STRIP_2 = 4;
+// Adafruit_NeoPixel strip2(LED_COUNT_STRIP_2, PIN_STRIP_2, NEO_GRB + NEO_KHZ800);
 
 void setup()
 {
@@ -50,23 +51,23 @@ void setupSerial()
 void setupLeds()
 {
     strip1.begin();
-    strip2.begin();
+    // strip2.begin();
 }
 
 void setupButtons()
 {
     // Controller set 1
-    // buttonA1.onPress(onButtonPress);
-    // buttonA1.onRelease(onButtonRelease);
+    buttonA1.onPress(onButtonPress);
+    buttonA1.onRelease(onButtonRelease);
 
-    // buttonB1.onPress(onButtonPress);
-    // buttonB1.onRelease(onButtonRelease);
+    buttonB1.onPress(onButtonPress);
+    buttonB1.onRelease(onButtonRelease);
 
-    // buttonC1.onPress(onButtonPress);
-    // buttonC1.onRelease(onButtonRelease);
+    buttonC1.onPress(onButtonPress);
+    buttonC1.onRelease(onButtonRelease);
 
-    // buttonD1.onPress(onButtonPress);
-    // buttonD1.onRelease(onButtonRelease);
+    buttonD1.onPress(onButtonPress);
+    buttonD1.onRelease(onButtonRelease);
 
     // buttonE1.onPress(onButtonPress);
     // buttonE1.onRelease(onButtonRelease);
@@ -91,13 +92,13 @@ void setupButtons()
 void loop()
 {
     // Controller set 1
-    // buttonA1.update();
-    // buttonB1.update();
-    // buttonC1.update();
-    // buttonD1.update();
+    buttonA1.update();
+    buttonB1.update();
+    buttonC1.update();
+    buttonD1.update();
     // buttonE1.update();
 
-    // printJoystickData(1, analogRead(Joystick1X), analogRead(Joystick1Y));
+    printJoystickData(1, analogRead(Joystick1X), analogRead(Joystick1Y));
 
     // Controller set 2
     // buttonA2.update();
@@ -110,11 +111,6 @@ void loop()
 
     // Serial
     listenSerial();
-
-    // Leds
-    // pixels.setPixelColor(0, 0, 255, 0);
-    strip1.show();
-    strip2.show();
 }
 
 void listenSerial()
@@ -136,10 +132,13 @@ void listenSerial()
 
         // Set pixel colors
         if (strip == "1")
+        {
             strip1.setPixelColor(index, color[0], color[1], color[2]);
+            strip1.show();
+        }
 
-        if (strip == "2")
-            strip2.setPixelColor(index, color[0], color[1], color[2]);
+        // if (strip == "2")
+        //     strip2.setPixelColor(index, color[0], color[1], color[2]);
     }
 }
 
@@ -190,17 +189,17 @@ void parseColorString(int color[3], String colorString)
 void onButtonPress(Button &button)
 {
     // Controller set 1
-    // if (button.is(buttonA1))
-    //     printButtonData("a", 1, "keydown");
+    if (button.is(buttonA1))
+        printButtonData("a", 1, "keydown");
 
-    // if (button.is(buttonB1))
-    //     printButtonData("b", 1, "keydown");
+    if (button.is(buttonB1))
+        printButtonData("b", 1, "keydown");
 
-    // if (button.is(buttonC1))
-    //     printButtonData("c", 1, "keydown");
+    if (button.is(buttonC1))
+        printButtonData("c", 1, "keydown");
 
-    // if (button.is(buttonD1))
-    //     printButtonData("d", 1, "keydown");
+    if (button.is(buttonD1))
+        printButtonData("d", 1, "keydown");
 
     // if (button.is(buttonE1))
     //     printButtonData("e", 1, "keydown");
@@ -225,17 +224,17 @@ void onButtonPress(Button &button)
 void onButtonRelease(Button &button)
 {
     // Controller set 1
-    // if (button.is(buttonA1))
-    //     printButtonData("a", 1, "keyup");
+    if (button.is(buttonA1))
+        printButtonData("a", 1, "keyup");
 
-    // if (button.is(buttonB1))
-    //     printButtonData("b", 1, "keyup");
+    if (button.is(buttonB1))
+        printButtonData("b", 1, "keyup");
 
-    // if (button.is(buttonC1))
-    //     printButtonData("c", 1, "keyup");
+    if (button.is(buttonC1))
+        printButtonData("c", 1, "keyup");
 
-    // if (button.is(buttonD1))
-    //     printButtonData("d", 1, "keyup");
+    if (button.is(buttonD1))
+        printButtonData("d", 1, "keyup");
 
     // if (button.is(buttonE1))
     //     printButtonData("e", 1, "keyup");
@@ -260,6 +259,11 @@ void onButtonRelease(Button &button)
 void printButtonData(String key, int id, String state)
 {
     Serial.println("type:button__key:" + String(key) + "__" + "id:" + String(id) + "__" + "state:" + String(state));
+}
+
+void printHomeButtonData(String key, int id, String state)
+{
+    // Serial.println("type:button-home__key:" + "home" + "__" + "id:" + "0" + "__" + "state:" + String(state));
 }
 
 void printJoystickData(int id, int x, int y)
