@@ -4,8 +4,8 @@
 #include <Adafruit_NeoPixel.h>
 
 // Serial
-// const int BAUD_RATE = 115200;
-const int BAUD_RATE = 9600;
+const int BAUD_RATE = 28800;
+// const int BAUD_RATE = 9600;
 
 // Controller set 1
 BasicButton buttonA1 = BasicButton(2);
@@ -263,7 +263,7 @@ void printButtonData(String key, int id, String state)
 
 void printHomeButtonData(String key, int id, String state)
 {
-    // Serial.println("type:button-home__key:" + "home" + "__" + "id:" + "0" + "__" + "state:" + String(state));
+    Serial.println("type:button-home__key:home__id:0__state" + String(state));
 }
 
 void printJoystickData(int id, int x, int y)
