@@ -7,7 +7,7 @@
 const int BAUD_RATE = 28800;
 
 bool read = true;
-bool write = false;
+bool write = true;
 
 BasicButton buttonHome = BasicButton(A2);
 
@@ -16,7 +16,7 @@ BasicButton buttonA1 = BasicButton(6);
 BasicButton buttonX1 = BasicButton(7);
 BasicButton buttonI1 = BasicButton(8);
 BasicButton buttonS1 = BasicButton(9);
-BasicButton buttonW1 = BasicButton(A0);
+BasicButton buttonW1 = BasicButton(A1);
 
 const int Joystick1X = 4;
 const int Joystick1Y = 5;
@@ -26,7 +26,7 @@ BasicButton buttonA2 = BasicButton(2);
 BasicButton buttonX2 = BasicButton(3);
 BasicButton buttonI2 = BasicButton(4);
 BasicButton buttonS2 = BasicButton(5);
-BasicButton buttonW2 = BasicButton(A1);
+BasicButton buttonW2 = BasicButton(A0);
 
 const int Joystick2X = 6;
 const int Joystick2Y = 7;
@@ -139,8 +139,8 @@ void loop()
     if (read)
         listenSerial();
 
-    read = !read;
-    write = !write;
+    // read = !read;
+    // write = !write;
 }
 
 void listenSerial()
