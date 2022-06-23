@@ -54,9 +54,9 @@ const int LED_COUNT_STRIP_4 = 5;
 Adafruit_NeoPixel strip4(LED_COUNT_STRIP_4, PIN_STRIP_4, NEO_GRB + NEO_KHZ800);
 
 // Animations
-String currentAnimation = "buildup";
-
-String buildupAnimationString = "buildup";
+int currentIndex = 0;
+String buildup1AnimationString = "buildup1";
+String buildup2AnimationString = "buildup2";
 String revealAnimationString = "reveal";
 String startAnimationString = "start";
 
@@ -80,6 +80,11 @@ void setupLeds()
     strip2.begin();
     strip3.begin();
     strip4.begin();
+
+    strip1.show();
+    strip2.show();
+    strip3.show();
+    strip4.show();
 }
 
 void setupButtons()
@@ -144,106 +149,211 @@ void loop()
 
     printJoystickData(2, analogRead(Joystick2X), analogRead(Joystick2Y));
 
-    // Serial
-    if (read)
-        // listenSerial();
-        listenSerialPrez();
-
-    // read = !read;
-    // write = !write;
-
+    // Animations
+    listenSerialPrez();
     ledAnimations();
 
     time++;
 }
 
+// Animations
 void listenSerialPrez()
 {
     if (Serial.available() > 0)
     {
         String serialData = Serial.readStringUntil('\n');
 
-        if (serialData == buildupAnimationString)
+        // Buildup 1
+        if (serialData == String(buildup1AnimationString))
         {
-            currentAnimation = buildupAnimationString;
+            currentIndex = 1;
         }
 
-        if (serialData == buildupAnimationString)
+        // Buildup 2
+        if (serialData == String(buildup2AnimationString))
         {
-            currentAnimation = buildupAnimationString;
+            currentIndex = 2;
+        }
+
+        // Reveal
+        if (serialData == String(revealAnimationString))
+        {
+            currentIndex = 3;
+        }
+
+        // Start
+        if (serialData == String(startAnimationString))
+        {
+            currentIndex = 4;
         }
     }
 }
 
 void ledAnimations()
 {
-    if (currentAnimation == buildupAnimationString)
+    // Buildup 1
+    if (currentIndex == 1)
     {
-        buildUpAnimation();
+        buildup1Animation();
     }
-
-    if (currentAnimation == revealAnimationString)
+    else if (currentIndex == 2)
+    {
+        buildup2Animation();
+    }
+    else if (currentIndex == 3)
     {
         revealAnimation();
     }
+    else if (currentIndex == 4)
+    {
+        startAnimation();
+    }
 }
 
-void buildUpAnimation()
+void buildup1Animation()
 {
-    float speed = 0.1;
-    float maxLED = 51.0;
-    float progress = (float(time) * speed) / maxLED;
+    float speed = 0.005;
+    float sineAnimation = (cos(time * speed) + 1.0) / 2.0 * 255.0;
 
+    // STRIP 1
     for (int i = 0; i < LED_COUNT_STRIP_1; i++)
     {
-        strip1.setPixelColor(i, 255, 0, 0);
+        strip1.setPixelColor(i, sineAnimation, 0, 0);
     }
-
-    for (int i = 0; i < LED_COUNT_STRIP_2; i++)
-    {
-        strip2.setPixelColor(i, 255, 0, 0);
-    }
-
-    for (int i = 0; i < LED_COUNT_STRIP_3; i++)
-    {
-        strip3.setPixelColor(i, 255, 0, 0);
-    }
-
-    for (int i = 0; i < LED_COUNT_STRIP_4; i++)
-    {
-        strip4.setPixelColor(i, 255, 0, 0);
-    }
-
-    float sineAnimation = (cos(time * speed) + 1.0) / 2.0 * 255.0;
-    strip1.setBrightness(int(sineAnimation));
-    strip2.setBrightness(int(sineAnimation));
-    strip3.setBrightness(int(sineAnimation));
-    strip3.setBrightness(int(sineAnimation));
 
     strip1.show();
+
+    // STRIP 2
+    for (int i = 0; i < LED_COUNT_STRIP_2; i++)
+    {
+        strip2.setPixelColor(i, sineAnimation, 0, 0);
+    }
+
     strip2.show();
+
+    // STRIP 3
+    for (int i = 0; i < LED_COUNT_STRIP_3; i++)
+    {
+        strip3.setPixelColor(i, sineAnimation, 0, 0);
+    }
+
     strip3.show();
+
+    // STRIP 4
+    for (int i = 0; i < LED_COUNT_STRIP_4; i++)
+    {
+        strip4.setPixelColor(i, sineAnimation, 0, 0);
+    }
+
+    strip4.show();
+}
+
+void buildup2Animation()
+{
+    // STRIP 1
+    int ledIndex1 = random(LED_COUNT_STRIP_1);
+    strip1.setPixelColor(ledIndex1, 255, 0, 0);
+    strip1.show();
+    strip1.setPixelColor(ledIndex1, 0, 0, 0);
+    strip1.show();
+
+    // STRIP 2
+    int ledIndex2 = random(LED_COUNT_STRIP_2);
+    strip2.setPixelColor(ledIndex2, 255, 0, 0);
+    strip2.show();
+    strip2.setPixelColor(ledIndex2, 0, 0, 0);
+    strip2.show();
+
+    // STRIP 3
+    int ledIndex3 = random(LED_COUNT_STRIP_3);
+    strip3.setPixelColor(ledIndex3, 255, 0, 0);
+    strip3.show();
+    strip3.setPixelColor(ledIndex3, 0, 0, 0);
+    strip3.show();
+
+    // STRIP 4
+    int ledIndex4 = random(LED_COUNT_STRIP_4);
+    strip4.setPixelColor(ledIndex4, 255, 0, 0);
+    strip4.show();
+    strip4.setPixelColor(ledIndex4, 0, 0, 0);
     strip4.show();
 }
 
 void revealAnimation()
 {
-    // int speed = 0.1;
-    // speed
-    // strip1.rainbow(int(time * speed), 1, 255, 200);
-    // strip2.rainbow(int(time * speed), 1, 255, 200);
-    // strip3.rainbow(int(time * speed), 1, 255, 200);
-    // strip4.rainbow(int(time * speed), 1, 255, 200);
+    int interval = 2000;
+    int speed = 150;
 
-    // strip1.show();
-    // strip2.show();
-    // strip3.show();
-    // strip4.show();
+    // STRIP 1
+    for (int i = 0; i < LED_COUNT_STRIP_1; i++)
+    {
+        uint32_t color = strip1.ColorHSV((i * interval) + (time * speed), 255, 255);
+        strip1.setPixelColor(i, color);
+    }
 
-    // strip1.rainbow(time, 1, 255, 255);
-    // strip2.rainbow(time, 1, 255, 255);
-    // strip3.rainbow(time, 1, 255, 255);
-    // strip4.rainbow(time, 1, 255, 255);
+    strip1.show();
+
+    // STRIP 2
+    for (int i = 0; i < LED_COUNT_STRIP_2; i++)
+    {
+        uint32_t color = strip2.ColorHSV((i * interval) + (time * speed), 255, 255);
+        strip2.setPixelColor(i, color);
+    }
+
+    strip2.show();
+
+    // STRIP 3
+    for (int i = 0; i < LED_COUNT_STRIP_3; i++)
+    {
+        uint32_t color = strip3.ColorHSV((i * interval) + (time * speed), 255, 255);
+        strip3.setPixelColor(i, color);
+    }
+
+    strip3.show();
+
+    // STRIP 4
+    for (int i = 0; i < LED_COUNT_STRIP_4; i++)
+    {
+        uint32_t color = strip4.ColorHSV((i * interval) + (time * speed), 255, 255);
+        strip4.setPixelColor(i, color);
+    }
+
+    strip4.show();
+}
+
+void startAnimation()
+{
+    // STRIP 1
+    for (int i = 0; i < LED_COUNT_STRIP_1; i++)
+    {
+        strip1.setPixelColor(i, 255, 0, 0);
+    }
+
+    strip1.show();
+
+    // STRIP 2
+    for (int i = 0; i < LED_COUNT_STRIP_2; i++)
+    {
+        strip2.setPixelColor(i, 255, 0, 0);
+    }
+
+    strip2.show();
+
+    // STRIP 3
+    for (int i = 0; i < LED_COUNT_STRIP_3; i++)
+    {
+        strip3.setPixelColor(i, 255, 0, 0);
+    }
+
+    strip3.show();
+
+    // STRIP 4
+    for (int i = 0; i < LED_COUNT_STRIP_4; i++)
+    {
+        strip4.setPixelColor(i, 255, 0, 0);
+    }
+
+    strip4.show();
 }
 
 void listenSerial()

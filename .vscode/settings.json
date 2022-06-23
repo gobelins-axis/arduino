@@ -11,6 +11,8 @@
         "__string": "cpp",
         "string": "cpp",
         "string_view": "cpp",
-        "locale": "cpp"
+        "locale": "cpp",
+        "complex": "cpp",
+        "chrono": "cpp"
     }
 }
