@@ -4,24 +4,25 @@
 #include <Adafruit_NeoPixel.h>
 
 // Serial
-const int BAUD_RATE = 115200;  // Increased for Teensy's faster capabilities
+//const int BAUD_RATE = 115200;  // Increased for Teensy's faster capabilities
+const int BAUD_RATE = 28800;
 
 bool read = true;
 bool write = true;
 
 unsigned long timeCounter = 0;
 
-BasicButton buttonHome = BasicButton(20);
+BasicButton buttonHome = BasicButton(12);
 
 // Controller set 1
-BasicButton buttonA1 = BasicButton(9);
-BasicButton buttonX1 = BasicButton(7);
+BasicButton buttonA1 = BasicButton(10);
+BasicButton buttonX1 = BasicButton(8);
 BasicButton buttonI1 = BasicButton(6);
 BasicButton buttonS1 = BasicButton(4);
-// BasicButton buttonW1 = BasicButton(17);
+BasicButton buttonW1 = BasicButton(2);
 
-// const int Joystick1X = A9;  // Pin 16 on Teensy
-// const int Joystick1Y = A8;  // Pin 17 on Teensy
+ const int Joystick1X = A13;  // Pin 27 on Teensy 4.1
+ const int Joystick1Y = A12;  // Pin 26 on Teensy
 
 // // Controller set 2
 // BasicButton buttonA2 = BasicButton(9);
@@ -116,8 +117,8 @@ void setupButtons()
     buttonS1.onPress(onButtonPress);
     buttonS1.onRelease(onButtonRelease);
 
-    // buttonW1.onPress(onButtonPress);
-    // buttonW1.onRelease(onButtonRelease);
+     buttonW1.onPress(onButtonPress);
+     buttonW1.onRelease(onButtonRelease);
 
     // // Controller set 2
     // buttonA2.onPress(onButtonPress);
@@ -146,7 +147,7 @@ void loop()
     buttonX1.update();
     buttonI1.update();
     buttonS1.update();
-    // buttonW1.update();
+    buttonW1.update();
 
     // printJoystickData(1, analogRead(Joystick1X), analogRead(Joystick1Y));
 
@@ -469,8 +470,8 @@ void onButtonPress(Button &button)
     if (button.is(buttonS1))
         printButtonData("s", 1, "keydown");
 
-    // if (button.is(buttonW1))
-    //     printButtonData("w", 1, "keydown");
+     if (button.is(buttonW1))
+        printButtonData("w", 1, "keydown");
 
     // // Controller set 2
     // if (button.is(buttonA2))
@@ -505,8 +506,8 @@ void onButtonRelease(Button &button, uint16_t duration)
     if (button.is(buttonS1))
         printButtonData("s", 1, "keyup");
 
-    // if (button.is(buttonW1))
-    //     printButtonData("w", 1, "keyup");
+     if (button.is(buttonW1))
+         printButtonData("w", 1, "keyup");
 
     // // Controller set 2
     // if (button.is(buttonA2))
@@ -550,6 +551,6 @@ void printHomeButtonData(String state)
 
 void printJoystickData(int id, int x, int y)
 {
-    // if (write)
-        // Serial.println("type:joystick__id:" + String(id) + "__" + "x:" + String(x) + "__" + "y:" + String(y));
+     if (write)
+         Serial.println("type:joystick__id:" + String(id) + "__" + "x:" + String(x) + "__" + "y:" + String(y));
 }
