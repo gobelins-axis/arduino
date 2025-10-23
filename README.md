@@ -51,11 +51,23 @@ arduino-cli board listall mkr
 
 ### Install the core for your board
 
+#### Arduino
+
 Install the core you need depending on your board
 Example: if your FQBN is "arduino:avr:nano" run
 
 ```bash
 arduino-cli core install arduino:avr
+```
+
+#### Teensy
+
+```bash
+arduino-cli config add board_manager.additional_urls https://www.pjrc.com/teensy/package_teensy_index.json
+```
+
+```bash
+arduino-cli core install teensy:avr
 ```
 
 ### Configure build script
