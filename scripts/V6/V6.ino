@@ -86,6 +86,10 @@ void loop()
 {
     // Poll on a fixed 1 ms tick. digitalRead on 7 pins takes microseconds,
     // so a free-running loop would only oversample the contact bounce.
+    // The host sends LED / action commands we do not handle yet. Drain them so
+    // the USB receive buffer never fills up.
+    while (Serial.available() > 0) Serial.read();
+
     const uint32_t now = millis();
     if (now == lastTickMs) return;
     lastTickMs = now;
@@ -105,7 +109,8 @@ void loop()
 void sendButtonEvent(const ButtonConfig& cfg, const char* state)
 {
     if (!SERIAL_OUTPUT_ENABLED) return;
-    Serial.printf("type:%s__key:%s__id:%u__state:%s\n", cfg.type, cfg.key, cfg.id, state);
+    // The host splits lines on "\r\n" (same terminator as Serial.println).
+    Serial.printf("type:%s__key:%s__id:%u__state:%s\r\n", cfg.type, cfg.key, cfg.id, state);
 }
 
 void sendLine(const char* line)
