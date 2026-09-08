@@ -66,11 +66,8 @@ const size_t BUTTON_COUNT = sizeof(BUTTONS) / sizeof(BUTTONS[0]);
 // through a 1:2 voltage divider (10k series, 20k to GND) before the Teensy
 // pin, because Teensy 4.1 pins are 3.3V only.
 //
-// The firmware calibrates itself so the host always receives a clean
-// 0..1023 signal centred on 512, whatever the physical range of the stick:
-//   - the rest position is measured at boot and becomes the centre,
-//   - the min / max of each axis start from an assumed travel and expand
-//     as the stick is moved, so a full sweep gives full resolution.
+// The firmware sends smoothed RAW 10-bit values (0..1023). Centre, range and
+// axis orientation are calibrated in the launcher, not here.
 
 struct JoystickConfig
 {
@@ -94,18 +91,6 @@ const uint8_t  ADC_HW_AVERAGING = 16;
 // Extra low-pass on top of hardware averaging. 0 < alpha <= 1, lower is smoother.
 const float    JOYSTICK_SMOOTHING_ALPHA = 0.25f;
 
-// Boot calibration: average the rest position for this long.
-const uint16_t JOYSTICK_BOOT_CALIBRATION_MS = 300;
-// If the measured rest position is outside this window the stick was probably
-// held during boot; fall back to the nominal centre instead.
-const uint16_t JOYSTICK_CENTER_MIN = 200;
-const uint16_t JOYSTICK_CENTER_MAX = 823;
-const uint16_t JOYSTICK_CENTER_DEFAULT = 512;
-// Assumed travel on each side of the centre before a full sweep has been seen.
-// Smaller than the real travel, so full deflection saturates (and menus react)
-// straight after boot; the range then grows to the real one as the stick moves.
-const uint16_t JOYSTICK_INITIAL_HALF_RANGE = 300;
-
 // A message is sent when either axis moved at least this many counts
 // since the last message...
 const uint16_t JOYSTICK_CHANGE_THRESHOLD = 4;
@@ -114,32 +99,19 @@ const uint32_t JOYSTICK_MIN_SEND_INTERVAL_MS = 10;
 // ...and at least this often even when idle, so the host keeps a live value.
 const uint32_t JOYSTICK_KEEPALIVE_INTERVAL_MS = 50;
 
-// Debug: also send the raw ADC values as "type:joystick-raw__..." lines.
-// The launcher ignores unknown types, so this is safe to leave on.
-const bool     JOYSTICK_SEND_RAW = false;
-
 // ---------------------------------------------------------------------------
 // State
 // ---------------------------------------------------------------------------
 
 DebouncedButton* buttons[BUTTON_COUNT];
 
-struct AxisCalibration
-{
-    float center;
-    float min;
-    float max;
-};
-
 struct JoystickState
 {
-    float           filteredX;
-    float           filteredY;
-    AxisCalibration calX;
-    AxisCalibration calY;
-    int16_t         lastSentX;
-    int16_t         lastSentY;
-    uint32_t        lastSendMs;
+    float    filteredX;
+    float    filteredY;
+    int16_t  lastSentX;
+    int16_t  lastSentY;
+    uint32_t lastSendMs;
 };
 
 JoystickState joysticks[JOYSTICK_COUNT];
@@ -164,7 +136,11 @@ void setup()
 
     for (size_t i = 0; i < JOYSTICK_COUNT; i++)
     {
-        calibrateJoystickAtBoot(i);
+        joysticks[i].filteredX = analogRead(JOYSTICKS[i].pinX);
+        joysticks[i].filteredY = analogRead(JOYSTICKS[i].pinY);
+        joysticks[i].lastSentX = -1;   // force a first message
+        joysticks[i].lastSentY = -1;
+        joysticks[i].lastSendMs = 0;
     }
 
     lastTickMs = millis();
@@ -200,58 +176,6 @@ void loop()
 // Joysticks
 // ---------------------------------------------------------------------------
 
-void calibrateJoystickAtBoot(size_t index)
-{
-    const JoystickConfig& cfg = JOYSTICKS[index];
-    JoystickState& st = joysticks[index];
-
-    // Average the rest position.
-    float sumX = 0, sumY = 0;
-    uint32_t samples = 0;
-    const uint32_t start = millis();
-    while (millis() - start < JOYSTICK_BOOT_CALIBRATION_MS)
-    {
-        sumX += analogRead(cfg.pinX);
-        sumY += analogRead(cfg.pinY);
-        samples++;
-        delay(1);
-    }
-
-    initAxisCalibration(st.calX, sumX / samples);
-    initAxisCalibration(st.calY, sumY / samples);
-
-    st.filteredX = st.calX.center;
-    st.filteredY = st.calY.center;
-    st.lastSentX = -1;   // force a first message
-    st.lastSentY = -1;
-    st.lastSendMs = 0;
-}
-
-void initAxisCalibration(AxisCalibration& cal, float restValue)
-{
-    const bool plausible = restValue >= JOYSTICK_CENTER_MIN && restValue <= JOYSTICK_CENTER_MAX;
-    cal.center = plausible ? restValue : JOYSTICK_CENTER_DEFAULT;
-    cal.min = max(0.0f,    cal.center - JOYSTICK_INITIAL_HALF_RANGE);
-    cal.max = min(1023.0f, cal.center + JOYSTICK_INITIAL_HALF_RANGE);
-}
-
-// Maps a filtered raw value to 0..1023 with the calibrated centre at 512.
-// Each side of the centre is scaled independently so an off-centre rest
-// position still gives a symmetric output.
-int16_t normalizeAxis(float value, AxisCalibration& cal)
-{
-    // Learn the real travel as the stick is moved.
-    if (value < cal.min) cal.min = value;
-    if (value > cal.max) cal.max = value;
-
-    float n;
-    if (value < cal.center) n = (value - cal.center) / (cal.center - cal.min);  // -1..0
-    else                    n = (value - cal.center) / (cal.max - cal.center);  //  0..1
-
-    n = constrain(n, -1.0f, 1.0f);
-    return (int16_t)constrain(512.0f + n * 512.0f, 0.0f, 1023.0f);
-}
-
 void updateJoystick(size_t index, uint32_t now)
 {
     const JoystickConfig& cfg = JOYSTICKS[index];
@@ -261,8 +185,8 @@ void updateJoystick(size_t index, uint32_t now)
     st.filteredX += (analogRead(cfg.pinX) - st.filteredX) * JOYSTICK_SMOOTHING_ALPHA;
     st.filteredY += (analogRead(cfg.pinY) - st.filteredY) * JOYSTICK_SMOOTHING_ALPHA;
 
-    const int16_t x = normalizeAxis(st.filteredX, st.calX);
-    const int16_t y = normalizeAxis(st.filteredY, st.calY);
+    const int16_t x = (int16_t)(st.filteredX + 0.5f);
+    const int16_t y = (int16_t)(st.filteredY + 0.5f);
 
     const uint32_t sinceLastSend = now - st.lastSendMs;
     const bool moved = abs(x - st.lastSentX) >= JOYSTICK_CHANGE_THRESHOLD
@@ -277,11 +201,6 @@ void updateJoystick(size_t index, uint32_t now)
     st.lastSentY = y;
     st.lastSendMs = now;
     sendJoystick(cfg.id, x, y);
-
-    if (JOYSTICK_SEND_RAW)
-    {
-        sendJoystickRaw(cfg.id, (int16_t)(st.filteredX + 0.5f), (int16_t)(st.filteredY + 0.5f));
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -300,12 +219,6 @@ void sendJoystick(uint8_t id, int16_t x, int16_t y)
 {
     if (!SERIAL_OUTPUT_ENABLED) return;
     Serial.printf("type:joystick__id:%u__x:%d__y:%d\r\n", id, x, y);
-}
-
-void sendJoystickRaw(uint8_t id, int16_t x, int16_t y)
-{
-    if (!SERIAL_OUTPUT_ENABLED) return;
-    Serial.printf("type:joystick-raw__id:%u__x:%d__y:%d\r\n", id, x, y);
 }
 
 void sendLine(const char* line)
