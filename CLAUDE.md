@@ -8,6 +8,13 @@ protocol contract and the design system live in `../CLAUDE.md`.
 `scripts/V6` is the current firmware. `V1`–`V5` are kept for history only; V5 is the
 last version of the old code (r89m Button library, Nano-era assumptions).
 
+`scripts/AlternativeController` is not cabinet firmware: it is the reference sketch for
+**alternative controllers**, extra boards (Uno, Nano, ESP32, Teensy...) plugged into the
+machine while it runs. `AxisAlternative.h` implements the protocol the launcher expects:
+115200 baud, answer `type:ping` (and announce from `setup()`) with
+`type:ready__controller:<name>__version:<n>`, then send `type:alternative__<fields>` lines.
+Copy the header into a new sketch; the `.ino` currently does the handshake only, no inputs yet.
+
 ## Hardware
 
 - **Teensy 4.1**: 3.3V logic, pins are **not** 5V tolerant. Replaced an Arduino Nano.
