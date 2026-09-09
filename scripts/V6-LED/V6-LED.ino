@@ -117,6 +117,10 @@ const uint8_t  LED_BRIGHTNESS = 96;
 // Frame rate for pushing colour changes to the strips.
 const uint32_t LED_FRAME_INTERVAL_MS = 16;   // ~60 Hz
 
+// Debug: light every strip full red at boot to check wiring, level shifter and
+// power. The colour stays until the host sends its first LED command.
+const bool LED_DEBUG_RED_ON_START = true;
+
 // ---------------------------------------------------------------------------
 // State
 // ---------------------------------------------------------------------------
@@ -173,6 +177,7 @@ void setup()
     }
 
     ledEngine.begin();   // strips start dark
+    if (LED_DEBUG_RED_ON_START) debugLightAllRed();
 
     lastTickMs = millis();
     sendLine("type:ready__version:6-led");
@@ -232,6 +237,19 @@ void updateJoystick(size_t index, uint32_t now)
     st.lastSentY = y;
     st.lastSendMs = now;
     sendJoystick(cfg.id, x, y);
+}
+
+// ---------------------------------------------------------------------------
+// LED debug
+// ---------------------------------------------------------------------------
+
+// Fills every strip with full red. The engine pushes it on the first frame of loop().
+void debugLightAllRed()
+{
+    for (uint8_t s = 0; s < LED_STRIP_COUNT; s++)
+    {
+        ledEngine.fill(s, 255, 0, 0);
+    }
 }
 
 // ---------------------------------------------------------------------------
