@@ -45,21 +45,21 @@ struct ButtonConfig
 };
 
 const ButtonConfig BUTTONS[] = {
-    { 12, "button-home", "home", 0 },
+    { 5, "button-home", "home", 0 },
 
     // Controller 1
-    { 10, "button", "a", 1 },
-    {  8, "button", "x", 1 },
-    {  6, "button", "i", 1 },
-    {  4, "button", "s", 1 },
-    {  2, "button", "w", 1 },
+    { 4, "button", "a", 1 },
+    {  3, "button", "x", 1 },
+    {  2, "button", "i", 1 },
+    {  1, "button", "s", 1 },
+    {  0, "button", "w", 1 },
 
     // Controller 2 (only W is wired today)
-    { 24, "button", "w", 2 },
-    // {  9, "button", "a", 2 },
-    // {  7, "button", "x", 2 },
-    // {  5, "button", "i", 2 },
-    // {  3, "button", "s", 2 },
+    {  6, "button", "a", 2 },
+    {  7, "button", "x", 2 },
+    {  8, "button", "i", 2 },
+    {  9, "button", "s", 2 },
+    { 10, "button", "w", 2 },
 };
 
 const size_t BUTTON_COUNT = sizeof(BUTTONS) / sizeof(BUTTONS[0]);
@@ -81,8 +81,8 @@ struct JoystickConfig
 };
 
 const JoystickConfig JOYSTICKS[] = {
-    { 1, A13, A12 },   // pins 27 / 26
-    // { 2, A4,  A5  },   // pins 18 / 19
+    { 1, A8, A9 },   // pins 27 / 26
+     { 2, A5,  A6  },   // pins 18 / 19
 };
 
 const size_t JOYSTICK_COUNT = sizeof(JOYSTICKS) / sizeof(JOYSTICKS[0]);
@@ -105,7 +105,7 @@ const uint32_t JOYSTICK_KEEPALIVE_INTERVAL_MS = 50;
 //   3: controller 1 buttons (6: W A X I S Home)   4: controller 2 buttons (5: W A X I S)
 
 const uint8_t  LED_STRIP_COUNT = 4;
-const uint8_t  LED_PINS[LED_STRIP_COUNT] = { 14, 15, 16, 17 };
+const uint8_t  LED_PINS[LED_STRIP_COUNT] = { A0, A11, A10, A3 };
 const uint16_t LED_STRIP_LENGTHS[LED_STRIP_COUNT] = { 51, 55, 6, 5 };
 // OctoWS2811 sends the same length on every pin; extra pixels past a strip's end are just black.
 const uint16_t LEDS_PER_STRIP = 55;
